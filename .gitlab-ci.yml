@@ -1,0 +1,12 @@
+image: eur0c.laas.fr:5000/humanoid-path-planner/hpp_foottrajectory
+
+build:
+  stage: build
+  script:
+    - cmake .
+    - make
+
+test:
+  stage: test
+  script:
+    - make test
