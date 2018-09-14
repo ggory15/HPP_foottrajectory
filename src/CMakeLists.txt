@@ -3,6 +3,7 @@ SET(LIBRARY_NAME ${PROJECT_NAME})
 SET(${LIBRARY_NAME}_SOURCES
   utils/Box.cc
   utils/ProblemConfig.cc
+  utils/Printer.cc
 
   functions/BoxAbovePlan.cc
   functions/BoxAboveFixedPlan.cc

@@ -46,9 +46,9 @@ namespace hpp{
     double precision_;
 
     /// @brief QP solver
-    qpOASES::SQProblem QPSolver_;
-    qpOASES::SQProblem LPSolver_;
-    qpOASES::QProblem LPSolverIndiv_;
+    qpOASES::SQProblem* QPSolver_;
+    qpOASES::SQProblem* LPSolver_;
+    qpOASES::SQProblem* LPSolverIndiv_;
 
     bool m_init_QP, m_init_LP, m_init_LPInd;
     qpOASES::returnValue m_status_QP, m_status_LP, m_status_LPInd;

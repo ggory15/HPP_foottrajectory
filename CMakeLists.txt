@@ -45,6 +45,7 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/foot/utils/PlanForHull.hh
   include/hpp/foot/utils/ProblemConfig.hh
   include/hpp/foot/utils/defs.hh
+  include/hpp/foot/utils/Printer.hh
   #
   include/hpp/foot/functions/BoxAbovePlan.hh
   include/hpp/foot/functions/BoxAboveFixedPlan.hh

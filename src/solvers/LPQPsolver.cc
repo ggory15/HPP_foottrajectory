@@ -37,16 +37,18 @@ void LPQPSolver::init(const Eigen::VectorXd& xInit)
   resHistory_[0] << res_;
   qpPlanesFixed_.formQP(xInit.tail(pb_.dimPlans()));
   qpBoxesFixed_.formQP(xInit.head(pb_.dimBoxes()), xInit.tail(pb_.dimPlans()));
-  QPSolver_ = SQProblem(qpPlanesFixed_.dimCstr(), qpPlanesFixed_.dimVar()); //skim check, constraint, variable)
-  LPSolver_ = SQProblem(qpBoxesFixed_.dimCstr(), qpBoxesFixed_.dimVar());
-  LPSolverIndiv_ = QProblem(25, 5, HST_ZERO);
+  QPSolver_ = new SQProblem(qpPlanesFixed_.dimVar(), qpPlanesFixed_.dimCstr()); //skim check, constraint, variable)
+  LPSolver_ = new SQProblem(qpBoxesFixed_.dimVar(), qpBoxesFixed_.dimCstr());
+  LPSolverIndiv_ = new SQProblem(5, 25, HST_ZERO);
+  //LPSolverIndiv_ = QProblem(25, 5, HST_ZERO);
   m_options.setToDefault();
   m_options.printLevel = PL_LOW;
   m_options.enableEqualities = BT_TRUE;
 
-  QPSolver_.setOptions(m_options);
-  LPSolver_.setOptions(m_options);
-  LPSolverIndiv_.setOptions(m_options);
+  QPSolver_->setOptions(m_options);
+  LPSolver_->setOptions(m_options);
+  LPSolverIndiv_->setOptions(m_options);
+
 //   QPSolver_.resize(qpPlanesFixed_.dimVar(), qpPlanesFixed_.dimCstr(),
 //                    Eigen::lssol::eType::QP2);
 //   LPSolver_.resize(qpBoxesFixed_.dimVar(), qpBoxesFixed_.dimCstr());
@@ -62,25 +64,13 @@ void LPQPSolver::formAndSolveQPPlanesFixed(RefVec x)
     MatrixRowMajorXd C_row = qpPlanesFixed_.C();
 
     int_t iter = 100;
-    if (!m_init_QP){
-        m_status_QP = QPSolver_.init(A_row.data(), qpPlanesFixed_.c().data(), C_row.data(), qpPlanesFixed_.lVar().data(), qpPlanesFixed_.uVar().data(), qpPlanesFixed_.l().data(), qpPlanesFixed_.u().data(), iter);
-        if (m_status_QP == SUCCESSFUL_RETURN) 
-			m_init_QP = true;
-         else
-            std::cerr << "QP solver Failed for initializing itself" << std::endl;      
-    }
-    else{
-        cout << "hotstart" << endl;
-        m_status_QP = QPSolver_.hotstart(A_row.data(), qpPlanesFixed_.c().data(), C_row.data(), qpPlanesFixed_.lVar().data(), qpPlanesFixed_.uVar().data(), qpPlanesFixed_.l().data(), qpPlanesFixed_.u().data(), iter);
-        if (m_status_QP != SUCCESSFUL_RETURN) {
-            m_init_QP = false;
-            std::cerr << "QP solver Failed durint hotstart" << std::endl;
-        }
-    }
-    if (m_status_QP == SUCCESSFUL_RETURN)
-        QPSolver_.getPrimalSolution(x_sol_.data());
-
-     x.head(pb_.dimBoxes()) << x_sol_.head(pb_.dimBoxes());
+    m_status_QP = QPSolver_->init(A_row.data(), qpPlanesFixed_.c().data(), C_row.data(), qpPlanesFixed_.lVar().data(), qpPlanesFixed_.uVar().data(), qpPlanesFixed_.l().data(), qpPlanesFixed_.u().data(), iter);
+    x_sol_.resize(A_row.rows());
+    x_sol_.setZero();
+    
+    QPSolver_->getPrimalSolution(x_sol_.data());
+    x.head(pb_.dimBoxes()) << x_sol_.head(pb_.dimBoxes());
+    QPSolver_->reset();
 
     // qpPlanesFixed_.printinTerminal();
     
@@ -114,40 +104,22 @@ void LPQPSolver::formAndSolveLPBoxesFixed(RefVec x)
 
 void LPQPSolver::formAndSolveIndividualLPBoxesFixed(RefVec x)
 {
-  MatrixRowMajorXd C_row;
   for (size_t iPlan = 0; iPlan < pb_.nMobilePlanCstr(); ++iPlan)
   {
+    int_t iter = 100;
     qpBoxesFixedIndividual_.formQP(iPlan, x.head(pb_.dimBoxes()),
                                    x.tail(pb_.dimPlans()));
-    C_row = qpBoxesFixedIndividual_.C();
-    int_t iter = 100;
-       //cout << qpBoxesFixedIndividual_.printinTerminal() << endl;
+    MatrixRowMajorXd C_row = qpBoxesFixedIndividual_.C();
+    LPSolverIndiv_->init(0, qpBoxesFixedIndividual_.c().data(), C_row.data(), qpBoxesFixedIndividual_.lVar().data(), qpBoxesFixedIndividual_.uVar().data(), 
+                    qpBoxesFixedIndividual_.l().data(), qpBoxesFixedIndividual_.u().data(), iter);
     
-    if (!m_init_LPInd){
-        cout << "first" << endl;
-        m_status_LPInd = LPSolverIndiv_.init(0, qpBoxesFixedIndividual_.c().data(), C_row.data(), qpBoxesFixedIndividual_.lVar().data(), qpBoxesFixedIndividual_.uVar().data(), qpBoxesFixedIndividual_.l().data(), qpBoxesFixedIndividual_.u().data(), iter);
-        if (m_status_LPInd == SUCCESSFUL_RETURN) 
-			m_init_LPInd = true;
-         else
-            std::cerr << "LP solver Failed for initializing itself" << std::endl;      
-    }
-    else{
-        cout << "second" << endl;
-        LPSolverIndiv_.reset();
-        cout << "reset" << endl;
-        m_status_LPInd = LPSolverIndiv_.init(0, qpBoxesFixedIndividual_.c().data(), C_row.data(), qpBoxesFixedIndividual_.lVar().data(), qpBoxesFixedIndividual_.uVar().data(), qpBoxesFixedIndividual_.l().data(), qpBoxesFixedIndividual_.u().data(), iter);
-        if (m_status_LPInd != SUCCESSFUL_RETURN) {
-            m_init_LPInd = false;
-            std::cerr << "LP solver Failed durint hotstart" << std::endl;
-        }
-    }
-    if (m_status_LPInd == SUCCESSFUL_RETURN){
-        x_sol_.resize(C_row.cols());
-        LPSolverIndiv_.getPrimalSolution(x_sol_.data());
-    }
+    x_sol_.resize(C_row.cols());
+    x_sol_.setZero();
+    
+    LPSolverIndiv_->getPrimalSolution(x_sol_.data());
     x.segment(pb_.dimBoxes() + 4 * iPlan, 4) << x_sol_.head(4);
+    LPSolverIndiv_->reset();
   }
-  getchar();
 }
 
 void LPQPSolver::solve()
@@ -170,7 +142,7 @@ void LPQPSolver::solve()
     if((prevRes - res_).head(pb_.dimBoxes()).norm() < precision_)
     {
       converged = true;
-      std::cout << "Alternate QP CONVERGED on iteration " << nIter << std::endl;
+      std::cout << "LPQP CONVERGED on iteration " << nIter << std::endl;
     }
     prevRes = res_;
 
@@ -183,13 +155,13 @@ void LPQPSolver::logAllX(const std::string& folderName) const
 {
   std::ofstream xLogFile;
   xLogFile.open(folderName + "xLog.m");
-
+ 
   for (size_t i = 0; i < totalIter_; i++)
   {
     xLogFile << "%============== iteration " << i
              << "==================" << std::endl;
     xLogFile << "x_" << i << " = ";
-    xLogFile << resHistory_[i].format(fmt::matlab) << std::endl;
+    xLogFile << resHistory_[i].format(fmt::matlabVector) << std::endl;
   }
   xLogFile.close();
 }
