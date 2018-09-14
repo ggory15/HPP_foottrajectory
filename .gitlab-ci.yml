@@ -1,3 +1,6 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: "recursive"
+
 image: eur0c.laas.fr:5000/humanoid-path-planner/hpp_foottrajectory
 
 build:
