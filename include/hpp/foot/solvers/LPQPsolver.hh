@@ -11,10 +11,10 @@
 
 #include <hpp/foot/TrajectoryProblem.hh> // done
 #include <hpp/foot/utils/defs.hh> // done
-#include <hpp/foot/utils/utils/QP.hh>
-#include <hpp/foot/utils/utils/QPPlanesFixed.hh>
-#include <hpp/foot/utils/utils/QPBoxesFixed.hh>
-#include <hpp/foot/utils/utils/QPBoxesFixedIndividual.hh>  
+#include <hpp/foot/solvers/QP.hh>
+#include <hpp/foot/solvers/QPPlanesFixed.hh> //done
+#include <hpp/foot/solvers/QPBoxesFixed.hh> // done
+#include <hpp/foot/solvers/QPBoxesFixedIndividual.hh> //done  
 
 namespace hpp{
     namespace foot
@@ -46,9 +46,14 @@ namespace hpp{
     double precision_;
 
     /// @brief QP solver
-    Eigen::LSSOL_QP QPSolver_;
-    Eigen::LSSOL_LP LPSolver_;
-    Eigen::LSSOL_LP LPSolverIndiv_;
+    qpOASES::SQProblem QPSolver_;
+    qpOASES::SQProblem LPSolver_;
+    qpOASES::QProblem LPSolverIndiv_;
+
+    bool m_init_QP, m_init_LP, m_init_LPInd;
+    qpOASES::returnValue m_status_QP, m_status_LP, m_status_LPInd;
+    qpOASES::Options m_options;
+    Eigen::VectorXd x_sol_;
 
     };
     } /* feettrajectory */

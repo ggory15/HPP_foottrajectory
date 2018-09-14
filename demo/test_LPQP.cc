@@ -1,6 +1,7 @@
 #include <iostream>
 #include <hpp/foot/utils/ProblemConfig.hh>
 #include <hpp/foot/TrajectoryProblem.hh>
+#include <hpp/foot/solvers/LPQPsolver.hh>
 
 using namespace std;
 using namespace hpp::foot;
@@ -39,9 +40,11 @@ int main(int argc, char* argv[])
     std::cout << "myProb: " << myProb << std::endl;
 
     // this part is for solving qp and lq.
-    
-
+    LPQPSolver LPQP(myProb, myProb.maxIter());
     myProb.normalizeNormals(initVec);
+
+    LPQP.init(initVec);
+    LPQP.solve();  
 
     return 0;
 }

@@ -50,8 +50,14 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/foot/functions/BoxAboveFixedPlan.hh
   include/hpp/foot/functions/CostDistance.hh
   include/hpp/foot/functions/FixedBoxPosition.hh
+  include/hpp/foot/functions/PlanBetweenBoxAndObstacle.hh
   #
   include/hpp/foot/solvers/LPQPsolver.hh
+  include/hpp/foot/solvers/QP.hh
+  include/hpp/foot/solvers/QPPlanesFixed.hh
+  include/hpp/foot/solvers/QPBoxesFixed.hh
+  include/hpp/foot/solvers/QPBoxesFixedIndividual.hh
+  
   #
   include/hpp/foot/TrajectoryProblem.hh
 )

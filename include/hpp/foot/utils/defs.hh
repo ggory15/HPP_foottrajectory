@@ -27,6 +27,7 @@ typedef Eigen::VectorXd::Index Index;
 typedef Eigen::Transpositions<Eigen::Dynamic, Eigen::Dynamic, int>
     Transpositions_t;
 
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRowMajorXd;
 namespace fmt
 {
 static const Eigen::IOFormat custom(3, 0, ", ", "\n", "[", "]");

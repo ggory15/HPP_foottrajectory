@@ -8,8 +8,16 @@ SET(${LIBRARY_NAME}_SOURCES
   functions/BoxAboveFixedPlan.cc
   functions/CostDistance.cc
   functions/FixedBoxPosition.cc
+  functions/PlanBetweenBoxAndObstacle.cc
+
+  solvers/QP.cc
+  solvers/QPPlanesFixed.cc
+  solvers/QPBoxesFixed.cc
+  solvers/QPBoxesFixedIndividual.cc
+  solvers/LPQPsolver.cc
 
   TrajectoryProblem.cc
+
 )
 SET(${LIBRARY_NAME}_HEADERS
   utils/Box.hh
