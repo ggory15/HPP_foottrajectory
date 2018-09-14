@@ -25,12 +25,10 @@ include_directories(${EIGEN3_INCLUDE_DIRS})
 include_directories(${YAML-CPP_INCLUDE_DIRS})
 
 
-SET(qpOASES_SOURCE_DIR /home/skim/HPP/install/include)
-SET(qpOASES_BINARY_DIR /home/skim/HPP/install/lib)
-include_directories(${qpOASES_SOURCE_DIR})
-link_directories(${qpOASES_BINARY_DIR})
-
-
+SET(QPOASES_PREFIX ${CMAKE_PREFIX_PATH} CACHE PATH "Set the prefix where qpOases is installed")
+FIND_PATH(QPOASES_INCLUDE_DIRS NAMES "qpOASES.hpp" PATHS ${QPOASES_PREFIX} PATH_SUFFIXES include)
+FIND_LIBRARY(QPOASES_LIBRARY "qpOASES" PATHS ${QPOASES_PREFIX} PATH_SUFFIXES lib)
+INCLUDE_DIRECTORIES(${QPOASES_INCLUDE_DIRS})
 
 # Activate hpp-util logging if requested
 SET (HPP_DEBUG FALSE CACHE BOOL "trigger hpp-util debug output")
@@ -58,7 +56,7 @@ SET(${PROJECT_NAME}_HEADERS
   include/hpp/foot/solvers/QPPlanesFixed.hh
   include/hpp/foot/solvers/QPBoxesFixed.hh
   include/hpp/foot/solvers/QPBoxesFixedIndividual.hh
-  
+
   #
   include/hpp/foot/TrajectoryProblem.hh
 )
@@ -69,4 +67,3 @@ add_subdirectory (demo)
 PKG_CONFIG_APPEND_LIBS("hpp-foot")
 
 SETUP_PROJECT_FINALIZE()
-
