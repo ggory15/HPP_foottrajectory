@@ -34,6 +34,7 @@ static const Eigen::IOFormat custom(3, 0, ", ", "\n", "[", "]");
 static const Eigen::IOFormat matlab(14, 0, ", ", ";\n", "[", "]", "[", "];");
 static const Eigen::IOFormat matlabVector(14, 0, ", ", ";", "", "", "[", "];");
 static const Eigen::IOFormat commaInit(14, 0, ", ", ", ", "", "", " << ", ";");
+static const Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "", "");
 }  // end of namespace defs
 
 } /* feettrajectory */

@@ -18,6 +18,7 @@ SET(${LIBRARY_NAME}_SOURCES
   solvers/LPQPsolver.cc
 
   TrajectoryProblem.cc
+  BoxesHullTrajProblem.cc
 
 )
 SET(${LIBRARY_NAME}_HEADERS

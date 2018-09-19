@@ -3,6 +3,9 @@
 #include <hpp/foot/TrajectoryProblem.hh>
 #include <hpp/foot/solvers/LPQPsolver.hh>
 #include <hpp/foot/utils/Printer.hh>
+#include <ctime>
+#include <unistd.h>
+#include <sys/time.h>
 
 using namespace std;
 using namespace hpp::foot;
@@ -43,31 +46,17 @@ int main(int argc, char* argv[])
     std::cout << "myProb: " << myProb << std::endl;
 
     // this part is for solving qp and lq.
+    timeval a;
+    timeval b;
+
+    gettimeofday(&a, 0);
     LPQP_ = new LPQPSolver(myProb, myProb.maxIter());
     myProb.normalizeNormals(initVec);
-
     LPQP_->init(initVec);
     LPQP_->solve();  
-
+    gettimeofday(&b, 0);
+    std::cout << "difference: " << b.tv_sec - a.tv_sec + (b.tv_usec - a.tv_usec)/1000000.0 << std::endl;
     LPQP_->logAllX("/home/skim/foot_data/");
-
-    // // Display the results
-    // printAllIterations(myProb.config()["logName"], myProb, LPQP_->res(),
-    //                     "/home/skim/foot_data/");
-    // std::cout << "log is saved" << std::endl;
-    // std::string command = "$DEVEL_HPP_DIR/src/foot_trajectory/scripts/animSteps.py logs/";
-    // if (argc > 1)
-    // {
-    // command += argv[1];
-    // }
-    // else
-    // {
-    // command += "singleObstacle";
-    // }
-    // command += ".log ";
-    // if (myProb.config().has("plotPlanes"))
-    // command += myProb.config()["plotPlanes"];
-    // system(command.c_str());
 
     return 0;
 }

@@ -158,10 +158,11 @@ void LPQPSolver::logAllX(const std::string& folderName) const
  
   for (size_t i = 0; i < totalIter_; i++)
   {
-    xLogFile << "%============== iteration " << i
-             << "==================" << std::endl;
-    xLogFile << "x_" << i << " = ";
-    xLogFile << resHistory_[i].format(fmt::matlabVector) << std::endl;
+    // xLogFile << "%============== iteration " << i
+    //          << "==================" << std::endl;
+    // xLogFile << "x_" << i << " = ";
+    //xLogFile << resHistory_[i].format(fmt::matlabVector) << std::endl;
+    xLogFile << resHistory_[i].transpose().format(fmt::CommaInitFmt) << std::endl;
   }
   xLogFile.close();
 }

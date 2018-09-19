@@ -24,11 +24,12 @@ ADD_REQUIRED_DEPENDENCY("yaml-cpp >= 0.5")
 include_directories(${EIGEN3_INCLUDE_DIRS})
 include_directories(${YAML-CPP_INCLUDE_DIRS})
 
-
 SET(QPOASES_PREFIX ${CMAKE_PREFIX_PATH} CACHE PATH "Set the prefix where qpOases is installed")
 FIND_PATH(QPOASES_INCLUDE_DIRS NAMES "qpOASES.hpp" PATHS ${QPOASES_PREFIX} PATH_SUFFIXES include)
 FIND_LIBRARY(QPOASES_LIBRARY "qpOASES" PATHS ${QPOASES_PREFIX} PATH_SUFFIXES lib)
 INCLUDE_DIRECTORIES(${QPOASES_INCLUDE_DIRS})
+
+ADD_REQUIRED_DEPENDENCY("ifopt")
 
 # Activate hpp-util logging if requested
 SET (HPP_DEBUG FALSE CACHE BOOL "trigger hpp-util debug output")
@@ -59,11 +60,13 @@ SET(${PROJECT_NAME}_HEADERS
 
   #
   include/hpp/foot/TrajectoryProblem.hh
+  include/hpp/foot/BoxesHullTrajProblem.hh
 )
 
 
 add_subdirectory (src)
 add_subdirectory (demo)
+
 PKG_CONFIG_APPEND_LIBS("hpp-foot")
 
 SETUP_PROJECT_FINALIZE()
