@@ -3,7 +3,7 @@
 #include <iostream>
 #include <Eigen/Core>
 
-#include <ifopt_core/problem.h>
+#include <ifopt/problem.h>
 
 #include <hpp/foot/utils/Box.hh>
 #include <hpp/foot/utils/FixedPlan.hh>
@@ -12,6 +12,8 @@
 #include <hpp/foot/functions/BoxAbovePlan.hh>
 #include <hpp/foot/functions/BoxAboveFixedPlan.hh>
 #include <hpp/foot/functions/FixedBoxPosition.hh>
+
+using namespace Eigen;
 
 namespace hpp
 {
@@ -26,10 +28,11 @@ class BoxesHullTrajProblem
   void getManifoldsize(const Index& nBoxes,const Index& nObstacles);
   Eigen::VectorXd findInitPoint();
 
-  void getTangentLB(RefVec out) const;
+
+  Eigen::VectorXd getTangentLB() const;
   void getTangentUB(RefVec out) const;
 
-  void evalObj(double& out) const;
+  void evalObj(double& out, const VectorXd& x) const;
   void evalObjDiff(RefMat out) const;
 
   void evalLinCstr(RefVec out, size_t i) const;
@@ -37,8 +40,8 @@ class BoxesHullTrajProblem
   void getLinCstrLB(RefVec out, size_t i) const;
   void getLinCstrUB(RefVec out, size_t i) const;
 
-  void evalNonLinCstr(RefVec out, size_t i) const;
-  void evalNonLinCstrDiff(RefMat out, size_t i) const;
+  void evalNonLinCstr(RefVec out, size_t i, RefVec x) const;
+  void evalNonLinCstrDiff(RefMat out, size_t i, RefVec x) const;
   void getNonLinCstrLB(RefVec out, size_t i) const;
   void getNonLinCstrUB(RefVec out, size_t i) const;
 

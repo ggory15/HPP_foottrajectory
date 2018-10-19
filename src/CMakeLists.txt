@@ -11,11 +11,11 @@ SET(${LIBRARY_NAME}_SOURCES
   functions/FixedBoxPosition.cc
   functions/PlanBetweenBoxAndObstacle.cc
 
-  solvers/QP.cc
-  solvers/QPPlanesFixed.cc
-  solvers/QPBoxesFixed.cc
-  solvers/QPBoxesFixedIndividual.cc
-  solvers/LPQPsolver.cc
+  # solvers/QP.cc
+  # solvers/QPPlanesFixed.cc
+  # solvers/QPBoxesFixed.cc
+  # solvers/QPBoxesFixedIndividual.cc
+  # solvers/LPQPsolver.cc
 
   TrajectoryProblem.cc
   BoxesHullTrajProblem.cc
@@ -29,8 +29,8 @@ ADD_LIBRARY(${LIBRARY_NAME}
   ${${LIBRARY_NAME}_SOURCES}
   )
 
-#PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} qpOASES)
+#PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} qpOASES
 
 #add_executable(exp1 test.cc)
-TARGET_LINK_LIBRARIES (${LIBRARY_NAME} ${Boost_LIBRARIES} ${QPOASES_LIBRARY})
+TARGET_LINK_LIBRARIES (${LIBRARY_NAME} ${Boost_LIBRARIES})
 INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION lib)

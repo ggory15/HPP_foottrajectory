@@ -13,11 +13,14 @@ MACRO(ADD_TESTCASE NAME GENERATED)
 
   # Link against Boost and project library.
   TARGET_LINK_LIBRARIES(${NAME}
-    /home/skim/HPP/install/lib/libifopt.so #fixme
     ${Boost_LIBRARIES} 
     ${PROJECT_NAME}
     yaml-cpp
+    -lrt
+#    -lqpOASES
+    -lifopt_core
+    -lifopt_ipopt
     )
 ENDMACRO(ADD_TESTCASE)
-ADD_TESTCASE(test_LPQP FALSE)
+#ADD_TESTCASE(test_LPQP FALSE)
 ADD_TESTCASE(test_NLP FALSE)
