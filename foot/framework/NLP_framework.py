@@ -23,7 +23,8 @@ class BoxesHullTrajProble(object):
         for i in range(0, self.nPlanes):
             self.boxAbovePlanFcts.append(Box(i, np.squeeze(np.asarray(self.config.boxSize))))
 
-        self.fixedFinalBox = np.matrix([self.config.finalPos])
+        self.initBoxAbovePlanFct = Box(-1, np.squeeze(np.asarray(self.config.boxSize)), self.config.initPos)
+        self.fixedFinalBox = np.matrix([self.config.finalPos], np.float_)
         self.fixedPlane.append(Plane(np.matrix([self.config.fixedPlane_normal]), np.matrix([self.config.fixedPlane_d])))
 
         for i in range(0, len(self.fixedPlane)):

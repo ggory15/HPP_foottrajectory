@@ -5,7 +5,7 @@ import os
 import eigenpy
 
 
-set_printoptions(linewidth=30, suppress=True, threshold=nan)
+set_printoptions(linewidth=100, suppress=True, threshold=nan)
 
 display = True
 plot = True
@@ -28,22 +28,35 @@ nvar = len(xInit.T)
 NLPvariables = variable(nvar)
 NLPcosts = cost(ProblemConfig.nBoxes, np.matrix([ProblemConfig.initPos]), nvar);
 NLPconstraint = constraint(0, myProb)
-
+NLPconst_set = constraints()
+#NLPconst_set.pushback_constraint(NLPconstraint)
+for i in range(0, 13):
+    NLPconst_set.pushback_constraint(constraint(i, myProb))
+#NLPconst_set.pushback_constraint(constraint(12, myProb))
+for i in range(24, 36):
+    NLPconst_set.pushback_constraint(constraint(i, myProb))
+const = constraint(35, myProb)
+#NLPconst_set.pushback_constraint(const)
 x0 = squeeze(asarray(xInit))
+print(x0)
+print("nocon", NLPconst_set.ncon, NLPconst_set.getG_L(), NLPconst_set.getG_U())
+print("NLPconst_set.nnzj", NLPconst_set.nnzj)
+#print("j1_diff", NLPconst_set.eval_jac_g(x0, True))
+print("j2_diff", const.eval_g(x0, True))
 def apply_new(x):
     return True
 
-
-nlp = pyipopt.create(nvar, NLPvariables.x_L, NLPvariables.x_U, NLPconstraint.ncon, NLPconstraint.g_L, NLPconstraint.g_U, NLPconstraint.nnzj, 0, NLPcosts.eval_f, NLPcosts.eval_grad_f, NLPconstraint.eval_g, NLPconstraint.eval_jac_g)
+nlp = pyipopt.create(nvar, NLPvariables.x_L, NLPvariables.x_U, NLPconst_set.ncon, NLPconst_set.getG_L(), NLPconst_set.getG_U(), NLPconst_set.nnzj, 0, NLPcosts.eval_f, NLPcosts.eval_grad_f, NLPconst_set.eval_g, NLPconst_set.eval_jac_g)
 
 nlp.str_option('linear_solver', 'mumps')
+#nlp.str_option("jacobian_approximation", "finite-difference-values")
 nlp.str_option("jacobian_approximation", "exact")
 nlp.str_option("hessian_approximation", "limited-memory")
 nlp.int_option('max_iter', 100)
-
+nlp.num_option('tol', 0.001)
 print("Going to call solve")
 x, zl, zu, constraint_multipliers, obj, status = nlp.solve(x0)
-# import pdb; pdb.set_trace()
+
 nlp.close()
 
 def print_variable(variable_name, value):
@@ -52,8 +65,6 @@ def print_variable(variable_name, value):
 
 print("Solution of the primal variables, x")
 print(x[0:36])
-#print_variable("x", x[0:6])
-
 
 
 '''
