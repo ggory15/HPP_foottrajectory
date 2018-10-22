@@ -1,4 +1,0 @@
-INPUT                  = /home/ggory15/ongoing work/HPP_foottrajectory/include
-IMAGE_PATH             = /home/ggory15/ongoing work/HPP_foottrajectory/doc/pictures
-FILE_PATTERNS          = *.h *.idl
-
