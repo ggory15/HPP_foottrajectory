@@ -4,8 +4,6 @@ import pinocchio as se3
 import os
 import eigenpy
 
-
-
 set_printoptions(linewidth=100, suppress=True, threshold=nan)
 
 display = True
@@ -60,3 +58,33 @@ def print_variable(variable_name, value):
 print("Solution of the primal variables, x")
 print(x[0:36])
 
+import gepetto.corbaserver
+from pinocchio.utils import *
+import time
+
+#os.system('gepetto-gui &')
+
+time.sleep(1)
+cl =gepetto.corbaserver.Client()
+gui = cl.gui
+#b=windowID = viewer.gui.deleteWindow ("viewtest")
+#a=gui.createSceneWithFloor("world")
+if not gui.nodeExists("world"):
+    gui.createScene("world")
+    windowID = gui.createWindow("viewtest")
+    gui.addSceneToWindow("world",windowID)
+
+#gui.applyConfiguration("world/floor",[0,0,0,  .7071,.7071,0,0])
+gui.addBox("world/obstacle", ProblemConfig.nObstacles_size[0]/2 , ProblemConfig.nObstacles_size[0]/2, ProblemConfig.nObstacles_size[2]/2, [1, 0, 0, 0.1])
+gui.applyConfiguration("world/obstacle", [ProblemConfig.nObstacles_center[0], ProblemConfig.nObstacles_center[1], ProblemConfig.nObstacles_center[2], 1, 0, 0, 0])
+
+gui.addBox("world/foot" + "init", ProblemConfig.boxSize[0] / 2, ProblemConfig.boxSize[1] / 2, ProblemConfig.boxSize[2] / 2, [0, 1, 0, 1])
+gui.applyConfiguration("world/foot" + "init", [ProblemConfig.initPos[0], ProblemConfig.initPos[1], ProblemConfig.initPos[2], 1, 0, 0, 0])
+for i in range(0, 12):
+    gui.addBox("world/foot"+str(i), ProblemConfig.boxSize[0]/2, ProblemConfig.boxSize[1]/2, ProblemConfig.boxSize[2]/2, [0, 1, 0, 0.5])
+    gui.applyConfiguration("world/foot"+str(i), [x0[i*3], x0[i*3+1], x0[i*3+2], 1, 0, 0, 0])
+for i in range(0, 12):
+    gui.addBox("world/foot_new"+str(i), ProblemConfig.boxSize[0]/2, ProblemConfig.boxSize[1]/2, ProblemConfig.boxSize[2]/2, [0, 0, 1, 0.5])
+    gui.applyConfiguration("world/foot_new"+str(i), [x[i*3], x[i*3+1], x[i*3+2], 1, 0, 0, 0])
+
+gui.refresh()
