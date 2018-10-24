@@ -17,7 +17,7 @@ class BoxesHullTrajProble(object):
 
         self.nMobilePlanCstr = self.config.nObstacles * self.config.nBoxes
         self.nFixedPlanCstr = self.nFixedPlanes * self.config.nBoxes
-        self.nCstr = self.nFixedPlanCstr +1 *2 * self.nMobilePlanCstr
+        self.nCstr = self.nFixedPlanCstr +1 + 2 * self.nMobilePlanCstr
         self.manifold_size = self.config.manifold_size
 
         for i in range(0, self.nPlanes):

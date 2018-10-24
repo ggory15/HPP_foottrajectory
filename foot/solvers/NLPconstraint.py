@@ -26,7 +26,10 @@ class constraint(object):
         elif self.index == self.NLP_framework.nFixedPlanCstr:
             self.nnzj = self.ncon
         elif self.index < self.NLP_framework.nCstr - self.NLP_framework.nMobilePlanCstr:
-            self.nnzj = self.ncon * 4
+            if (self.iBox0Above != -1 and self.iBox1Above != self.NLP_framework.config.nBoxes):
+                self.nnzj = 144
+            else:
+                self.nnzj = 120
         else:
             self.nnzj = self.ncon * 3
 
@@ -145,17 +148,82 @@ class constraint(object):
         elif self.index < self.NLP_framework.nCstr - self.NLP_framework.nMobilePlanCstr:
             if flag:
                 iC = -1*self.NLP_framework.config.nBoxes +4*self.index -4
-                row_index = np.array(np.zeros(4), np.int)
-                for i in range(1, self.ncon):
-                    row_index2 = np.array(np.ones(4)*i, np.int)
-                    row_index = np.append(row_index, row_index2)
+                if (self.iBox0Above != -1 and self.iBox1Above != self.NLP_framework.config.nBoxes):
+                    row_index = np.array(np.zeros(3), np.int)
+                    for i in range(1, 8):
+                        row_index2 = np.array(np.ones(3) * i, np.int)
+                        row_index = np.append(row_index, row_index2)  # for box 1 (3 * 8)
+                    for i in range(8, 16):
+                        row_index = np.append(row_index, np.ones(3) * i)  # for box 1 (3 * 8
+                    for i in range(0, 8):
+                        row_index = np.append(row_index, np.ones(1) * i)  # for plane d1 (1 * 8)
+                    for i in range(0, 8):
+                        row_index = np.append(row_index, np.array(np.ones(3) * i))  # for plane normal1 (3*8)
+                    for i in range(8, 16):
+                        row_index = np.append(row_index, np.array(np.ones(1) * i))  # for plane d2 (1*8)
+                    for i in range(8, 16):
+                        row_index = np.append(row_index, np.array(np.ones(3) * i))  # for plane normal2 (3*8)
+                    for i in range(16, 24):
+                        row_index = np.append(row_index, np.array(np.ones(1) * i))  # for plane obstalce d (1*8)
+                    for i in range(16, 24):
+                        row_index = np.append(row_index, np.array(np.ones(3) * i))  # for plane obstalce normal (3*8)
 
-                col_index = np.array([iC, iC + 1, iC + 2, iC + 3], np.int)
-                for i in range(1, self.ncon):
-                    col_index2 = np.array([iC, iC + 1, iC + 2, iC + 3], np.int)
-                    col_index = np.append(col_index, col_index2)
+                    ####### Column ###########
+                    col_index = np.array([3 * self.iBox0Above, 3 * self.iBox0Above + 1, 3 * self.iBox0Above + 2], np.int)
+                    for i in range(1, 8):
+                        col_index2 = np.array([3 * self.iBox0Above, 3 * self.iBox0Above + 1, 3 * self.iBox0Above + 2], np.int)
+                        col_index = np.append(col_index, col_index2)  # for box 1 ( 8 * 3)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([3 * self.iBox1Above, 3 * self.iBox1Above + 1, 3 * self.iBox1Above + 2], np.int))
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC]))  # for plane d (8 * 1)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC + 1, iC + 2, iC + 3]))  # for plane normal ( 8 * 3)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC]))  # for plane d (8 * 1)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC + 1, iC + 2, iC + 3]))  # for plane normal ( 8 *
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC]))  # for plane d (8 * 1)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC + 1, iC + 2, iC + 3]))  # for plane normal ( 8 *
+                elif (self.iBox0Above == -1 and self.iBox1Above != self.NLP_framework.config.nBoxes):
+                    row_index = np.array(np.ones(3) * 8, np.int)
+                    for i in range(9, 16):
+                        row_index2 = np.array(np.ones(3)*i, np.int)
+                        row_index = np.append(row_index, row_index2) # for box 1 (3 * 8)
+                    for i in range(0, 8):
+                        row_index = np.append(row_index, np.ones(1)*i) # for plane d1 (1 * 8)
+                    for i in range(0, 8):
+                        row_index = np.append(row_index, np.array(np.ones(3)*i)) # for plane normal1 (3*8)
+                    for i in range(8, 16):
+                        row_index = np.append(row_index, np.array(np.ones(1)*i)) # for plane d2 (1*8)
+                    for i in range(8, 16):
+                        row_index = np.append(row_index, np.array(np.ones(3) * i))  # for plane normal2 (3*8)
+                    for i in range(16, 24):
+                        row_index = np.append(row_index, np.array(np.ones(1)*i)) # for plane obstalce d (1*8)
+                    for i in range(16, 24):
+                        row_index = np.append(row_index, np.array(np.ones(3) * i))  # for plane obstalce normal (3*8)
 
+                    ####### Column ###########
+                    col_index = np.array([3 * self.iBox1Above, 3 * self.iBox1Above+1, 3 * self.iBox1Above+2], np.int)
+                    for i in range(1, 8):
+                        col_index2 = np.array([3 * self.iBox1Above, 3 * self.iBox1Above+1, 3 * self.iBox1Above+2], np.int)
+                        col_index = np.append(col_index, col_index2) # for box 1 ( 8 * 3)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC])) # for plane d (8 * 1)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC+1, iC+2, iC+3])) # for plane normal ( 8 * 3)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC])) # for plane d (8 * 1)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC+1, iC+2, iC+3])) # for plane normal ( 8 *
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC])) # for plane d (8 * 1)
+                    for i in range(0, 8):
+                        col_index = np.append(col_index, np.array([iC+1, iC+2, iC+3])) # for plane normal ( 8 *
                 self.jac_g = (row_index, col_index)
+                print(self.jac_g)
                 return self.jac_g
             else:
                 transBelow = np.array(self.NLP_framework.config.nObstacles_center)
@@ -163,23 +231,55 @@ class constraint(object):
                 d = x[-1*self.NLP_framework.config.nBoxes +4*self.index -4]
 
                 if (self.iBox0Above != -1 and self.iBox1Above != self.NLP_framework.config.nBoxes):
+                    self.jac_g = np.array(np.zeros(self.nnzj), np.float_)
                     trans0Above = x[3*self.iBox0Above: 3+3*self.iBox0Above]
                     trans1Above = x[3*self.iBox1Above: 3+3*self.iBox1Above]
-
                     box0AbovePlanFct = self.NLP_framework.boxAbovePlanFcts[self.iBox0Above]
                     box1AbovePlanFct = self.NLP_framework.boxAbovePlanFcts[self.iBox1Above]
+                    for j in range(0, 16):
+                        for i in range(0, 3):
+                            self.jac_g[i + 3 * j] = normal[i]
+                    for i in range(0, 8):
+                        self.jac_g[48 + i] = -1.0
+                    tmpDiff = self.getDiffNormal(trans0Above, np.array([0, 0, 0, 1]), box0AbovePlanFct)
+                    for i in range(0, 24):
+                        self.jac_g[56 + i] = tmpDiff[i] # 56
+                    for i in range(0, 8):
+                        self.jac_g[80 + i] = -1.0 # 64
+                    tmpDiff = self.getDiffNormal(trans1Above, np.array([0, 0, 0, 1]), box1AbovePlanFct)
+                    for i in range(0, 24):
+                        self.jac_g[88 + i] = tmpDiff[i] # 56
+                    for i in range(0, 8):
+                        self.jac_g[112 + i] = 1.0 # 64
+                    tmpDiff = self.getDiffNormal(transBelow, np.array([0, 0, 0, 1]), self.NLP_framework.obstacleAbovePlanFcts[self.iBoxBelow])
+                    for i in range(0, 24):
+                        self.jac_g[120 + i] = -tmpDiff[i] # 56
+
                 elif (self.iBox0Above == -1 and self.iBox1Above != self.NLP_framework.config.nBoxes):
+                    self.jac_g = np.array(np.zeros(self.nnzj), np.float_)
                     trans0Above = np.squeeze(np.asarray(self.NLP_framework.config.initPos))
                     trans1Above = x[3 * self.iBox1Above: 3 + 3 * self.iBox1Above]
                     box0AbovePlanFct = self.NLP_framework.initBoxAbovePlanFct
                     box1AbovePlanFct = self.NLP_framework.boxAbovePlanFcts[self.iBox1Above]
-                    out = np.matrix(np.zeros(8, 3))
-
-
-                for i in range(0, 8):
-                    self.g[i] = (trans0Above + box0AbovePlanFct.vertex[i]).dot(normal) - d
-                    self.g[i+8] = (trans1Above + box0AbovePlanFct.vertex[i]).dot(normal) - d
-                    self.g[i+16] = (transBelow + self.NLP_framework.obstacleAbovePlanFcts[self.iBoxBelow].vertex[i]).dot(-normal) + d
+                    for j in range(0, 8):
+                        for i in range(0, 3):
+                            self.jac_g[i + 3 * j] = normal[i]
+                    for i in range(0, 8):
+                        self.jac_g[24 + i] = -1.0
+                    tmpDiff = self.getDiffNormal(trans0Above, np.array([0, 0, 0, 1]), box0AbovePlanFct)
+                    for i in range(0, 24):
+                        self.jac_g[32 + i] = tmpDiff[i] # 56
+                    for i in range(0, 8):
+                        self.jac_g[56 + i] = -1.0 # 64
+                    tmpDiff = self.getDiffNormal(trans1Above, np.array([0, 0, 0, 1]), box1AbovePlanFct)
+                    for i in range(0, 24):
+                        self.jac_g[64 + i] = tmpDiff[i] # 56
+                    for i in range(0, 8):
+                        self.jac_g[88 + i] = 1.0 # 64
+                    tmpDiff = self.getDiffNormal(transBelow, np.array([0, 0, 0, 1]), self.NLP_framework.obstacleAbovePlanFcts[self.iBoxBelow])
+                    for i in range(0, 24):
+                        self.jac_g[96 + i] = -tmpDiff[i] # 56
+                return self.jac_g
         else:
             if flag:
                 iC = -5*self.NLP_framework.config.nBoxes +4*self.index -3
@@ -191,6 +291,16 @@ class constraint(object):
                 self.jac_g = np.array([2.0*x_now[0], 2.0*x_now[1], 2.0*x_now[2]], np.float_)
                 return self.jac_g
 
+    def getDiffNormal(self, t, q, box):
+        diff = np.array(np.zeros(24))
+        for i in range(0, 8):
+            v = box.vertex[i]
+            diff[i * 3] = t[0] - v[0] * (2* q[1] * q[1] + 2*q[2] * q[2] - 1.0) - v[1] * (2*q[3] * q[2] - 2*q[0] *q[1]) + v[2] * (2 *q[3] *q[1] + 2*q[0]*q[2])
+            diff[i * 3 + 1] = t[1] - v[1] * (2 * q[0] * q[0] + 2 * q[2] * q[2] - 1.0) + v[0] * (
+            2 * q[3] * q[2] + 2 * q[0] * q[1]) - v[2] * (2 * q[3] * q[0] - 2 * q[1] * q[2])
+            diff[i * 3 + 2] = t[2] - v[2] * (2 * q[0] * q[0] + 2 * q[1] * q[1] - 1.0) - v[0] * (
+            2 * q[3] * q[1] - 2 * q[0] * q[2]) + v[1] * (2 * q[3] * q[0] + 2 * q[1] * q[2])
+        return diff
 '''
 0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00 -1.00 -1.10 -0.05 -0.37  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
 
