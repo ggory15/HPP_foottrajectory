@@ -6,6 +6,7 @@ Dependencies
 ----
 1) YAML_CPP (sudo apt install libyaml-cpp-dev)
 2) pinochio and gepetto-viewer (https://github.com/stack-of-tasks/pinocchio)
+3) Pyipopt (https://github.com/xuy/pyipopt)
 
 Install
 ----
